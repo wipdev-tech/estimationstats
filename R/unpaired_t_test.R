@@ -41,10 +41,6 @@ es_flextable <- c("Drug 1*", "Drug 2*", "Unpaired mean difference", "CI**") %>%
   as.data.frame() %>% 
   flextable() %>% 
   delete_part("header") %>% 
-  hline_top() %>% 
-  hline_bottom() %>% 
-  hline(i = 1) %>% 
-  autofit() %>% 
   add_footer_lines(
     paste0(
       "* Mean (SD)",
@@ -71,14 +67,39 @@ t_flextable <- c("Statistic", "DF", "CI*", "p-value") %>%
   as.data.frame() %>% 
   flextable() %>% 
   delete_part("header") %>% 
-  hline_top() %>% 
-  hline_bottom() %>% 
-  hline(i = 1) %>% 
-  autofit() %>% 
   add_footer_lines("* Theoretical (t-distribution) confidence interval")
 
 # exportable output ----
 
-es_plot
-es_flextable
-t_flextable
+format_flextable <- function(ft) {
+  ft %>%
+    hline_top() %>%
+    hline_bottom() %>%
+    hline(i = 1) %>%
+    autofit() %>%
+    style(
+      part = "all",
+      pr_t = officer::fp_text(font.family = "Times New Roman")
+    ) %>%
+    style(
+      part = "footer",
+      pr_t = officer::fp_text(font.family = "Times New Roman", font.size = 9)
+    )
+}
+
+es_flextable %>%
+  format_flextable() %>%
+  save_as_docx(path = "inst/table1.docx")
+
+t_flextable %>%
+  format_flextable() %>% 
+  save_as_docx(path = "inst/table2.docx")
+
+ggsave(
+  es_plot,
+  filename = "inst/fig1.png",
+  device = "png",
+  width = 6,
+  height = 7,
+  type = "cairo"
+)
